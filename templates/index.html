@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerMatch Pro | Job Recommendation System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="container">
+                <h1><i class="fas fa-briefcase"></i> CareerMatch Pro</h1>
+                <p class="tagline">Find your perfect job match with AI-powered recommendations</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Upload Section -->
+                <section class="upload-section card">
+                    <h2><i class="fas fa-cloud-upload-alt"></i> Upload Your Resume</h2>
+                    <p>Get personalized job recommendations by uploading your resume (PDF or DOCX)</p>
+                    
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    <i class="fas fa-{% if category == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" enctype="multipart/form-data" class="upload-form">
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="resume" name="resume" accept=".pdf,.docx" required>
+                            <label for="resume" class="file-upload-label">
+                                <i class="fas fa-file-upload"></i>
+                                <span class="file-upload-text">Choose a file</span>
+                                <span class="file-upload-btn">Browse</span>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-search"></i> Find My Matches
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Results Sections -->
+                {% if skills or recommendations %}
+                <div class="results-container">
+                    <!-- Skills Section -->
+                    {% if skills %}
+                    <section class="skills-section card">
+                        <h2><i class="fas fa-lightbulb"></i> Your Skills</h2>
+                        <div class="skills-cloud">
+                            {% for skill in skills %}
+                                <span class="skill-tag">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {% endif %}
+
+                    <!-- Recommendations Section -->
+                    {% if recommendations %}
+                    <section class="recommendations-section">
+                        <h2><i class="fas fa-star"></i> Top Job Matches</h2>
+                        <div class="recommendations-grid">
+                            {% for job in recommendations %}
+                            <div class="job-card">
+                                <div class="job-card-header">
+                                    <h3>{{ job['Job Title'] }}</h3>
+                                    <p class="company">{{ job['Company Name'] }}</p>
+                                </div>
+                                
+                                <div class="match-score">
+                                    <div class="score-circle" style="--score-percent: {{ job['final_score'] * 100 }}%">
+                                        <span>{{ "%.0f"|format(job['final_score'] * 100) }}%</span>
+                                    </div>
+                                    <div class="score-details">
+                                        <div class="score-bar">
+                                            <div class="bar-fill" style="width: {{ job['final_score'] * 100 }}%"></div>
+                                        </div>
+                                        <small>Match Score</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="matched-skills">
+                                    <h4><i class="fas fa-check-circle"></i> Matched Skills</h4>
+                                    <div class="skills-list">
+                                        {% for skill in job['matched_skills'] %}
+                                            <span class="matched-skill">{{ skill }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <a href="{{ job['Link URL'] }}" target="_blank" class="btn-apply">
+                                    <i class="fas fa-external-link-alt"></i> View Job
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>© 2023 CareerMatch Pro | AI-Powered Job Recommendations</p>
+                <div class="footer-links">
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fas fa-question-circle"></i></a>
+                    <a href="#"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
